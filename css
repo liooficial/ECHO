@@ -123,3 +123,7 @@ main .sobre-nosotros{
     font-style: italic;
     text-align: justify;
 }
+canvas {
+    max-width: 800px;
+    margin: 0 auto;
+}
