@@ -1,0 +1,76 @@
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
+public class cliente {
+    public static void main(String[] args) {
+        try {
+            System.out.print("iniciando conexion...");
+            Socket socket = new Socket("192.168.0.12", 3306);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Introduce Temperatura: ");
+            String temperatura = scanner.nextLine();
+            out.println(temperatura);
+            socket.close();
+            scanner.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.print("enviando....");
+    }
+
+}
+
+
+
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class cliente {
+    public static void main(String[] args) {
+        int server_port = 3306;
+        try {
+            System.out.println("Esperando por una conexión...");
+
+            while (true) {
+                ServerSocket client_socket =  new ServerSocket( server_port);
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/Progama1", "root", "uiop098765");
+
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(client_socket.getInputStream()));
+                    String temperature_str = reader.readLine();
+                    int temperature = Integer.parseInt(temperature_str);
+
+                    String sql = "INSERT INTO temperatura (temp) VALUES (?)";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setInt(1, temperature);
+                    stmt.executeUpdate();
+                    System.out.println("Temperatura recibida y almacenada: " + temperature);
+                } catch (IOException e) {
+                    System.out.println("Error al recibir la temperatura: " + e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("Error al almacenar la temperatura en la base de datos: " + e.getMessage());
+                } finally {
+                    client_socket.close();
+                    conn.close();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error al abrir el socket: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("Error al conectar a la base de datos: " + e.getMessage());
+        }
+    }
+}
