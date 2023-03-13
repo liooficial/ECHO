@@ -1,0 +1,41 @@
+// Obtener el elemento canvas
+var canvas = document.getElementById('grafico');
+
+// Obtener los datos PHP y convertirlos a formato JavaScript
+var datosPHP = <?php echo json_encode($datos); ?>;
+var etiquetas = datosPHP.map(function(d) { return d.ID; });
+var valores = datosPHP.map(function(d) { return d.Temp; });
+
+// Configurar la gráfica lineal con Chart.js
+var grafico = new Chart(canvas, {
+    type: 'line',
+    data: {
+        labels: etiquetas,
+        datasets: [{
+            label: 'ID',
+            data: valores,
+            borderColor: 'blue',
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+            display: false
+        },
+        scales: {
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                }
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
